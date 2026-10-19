@@ -1,0 +1,6 @@
+image:
+  repository: o2c-erp-mock
+  tag: "0.1.0"
+containerPort: 8100
+healthPath: /health
+secretName: erp-mock-secrets
