@@ -1,0 +1,11 @@
+# Weekly updates of the pinned actions (o2c-app ADR-015).
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]

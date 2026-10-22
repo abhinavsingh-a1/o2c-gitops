@@ -1,0 +1,12 @@
+# yamllint for the environment values (o2c-app ADR-015)
+extends: default
+rules:
+  # Git normalises line endings (LF in the repo, CRLF in Windows checkouts)
+  new-lines: disable
+  document-start: disable  # plain values files, no --- needed
+  line-length:
+    max: 120
+  truthy:
+    check-keys: false  # Kubernetes/Helm keys such as "on" are not booleans here
+ignore: |
+  .git/
