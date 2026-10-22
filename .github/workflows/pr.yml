@@ -1,0 +1,71 @@
+# PR gates for o2c-gitops (o2c-app ADR-015): every values file must lint and render with
+# the shared chart from o2c-infra main, so a broken values file fails the PR instead of
+# the ArgoCD sync. Actions pinned to commit SHAs (version in the comment).
+name: PR
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  HELM_VERSION: "v4.3.1"
+
+jobs:
+  yamllint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e  # v10.3.2
+        with:
+          version: "0.13.1"
+      - run: uvx --from yamllint==1.38.0 yamllint --strict .
+
+  render:
+    name: render (helm template, chart from o2c-infra main)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Checkout the chart (o2c-infra main)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          repository: ${{ github.repository_owner }}/o2c-infra
+          ref: main
+          path: o2c-infra
+          persist-credentials: false
+      - uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310  # v5.0.1
+        with:
+          version: ${{ env.HELM_VERSION }}
+      - name: helm template every envs/*/*.yaml
+        run: |
+          shopt -s nullglob
+          files=(envs/*/*.yaml)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::no values files under envs/"
+            exit 1
+          fi
+          status=0
+          for values in "${files[@]}"; do
+            env=$(basename "$(dirname "$values")")
+            release=$(basename "$values" .yaml)
+            if helm template "$release" o2c-infra/helm/o2c-service \
+              --namespace "o2c-$env" --values "$values" > /dev/null; then
+              echo "ok $values"
+            else
+              echo "::error file=$values::helm template failed"
+              status=1
+            fi
+          done
+          exit "$status"
