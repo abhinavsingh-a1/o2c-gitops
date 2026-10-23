@@ -5,7 +5,7 @@
 # The image's CMD runs the Alembic migrations, then the API
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-erp-mock
-  digest: ""
+  digest: "sha256:f3c930104923247b88dcbe69863bda683703523f61aafd02724b45b23f06dfed"
 containerPort: 8100
 healthPath: /health
 # Keys: ERP_DATABASE_URL
