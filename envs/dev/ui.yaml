@@ -1,0 +1,25 @@
+# Dev values for ui (shared chart o2c-infra/helm/o2c-service >= 0.3.0).
+# image.repository and image.digest are set by o2c-app's release workflow (ADR-016):
+# the pod runs repository@digest; the digest stays empty until the first release.
+# The ui needs no secrets.
+# nginx-unprivileged runs as uid 101 and writes only to /tmp
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-ui
+  digest: ""
+containerPort: 8080
+healthPath: /
+secretName: ""
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+  runAsGroup: 101
+  fsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault

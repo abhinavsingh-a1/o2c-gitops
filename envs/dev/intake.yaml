@@ -1,0 +1,28 @@
+# Dev values for intake (shared chart o2c-infra/helm/o2c-service >= 0.3.0).
+# image.repository and image.digest are set by o2c-app's release workflow (ADR-016):
+# the pod runs repository@digest; the digest stays empty until the first release.
+# Secrets are referenced by name only; the Secret intake-secrets is created outside Git.
+# gunicorn with 2 workers; metrics in multiprocess mode under /tmp (ADR-012)
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-intake
+  digest: ""
+containerPort: 8200
+healthPath: /health
+command:
+  - "gunicorn"
+  - "-c"
+  - "python:intake.gunicorn_conf"
+  - "intake.app:create_app()"
+env:
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  S3_ENDPOINT_URL: "http://s3:8333"
+  PROMETHEUS_MULTIPROC_DIR: "/tmp/prometheus-intake"
+# Keys: INTAKE_HMAC_SECRET, S3_ACCESS_KEY, S3_SECRET_KEY
+secretName: intake-secrets
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

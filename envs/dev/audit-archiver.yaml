@@ -1,0 +1,27 @@
+# Dev values for audit-archiver (shared chart o2c-infra/helm/o2c-service >= 0.3.0).
+# image.repository and image.digest are set by o2c-app's release workflow (ADR-016):
+# the pod runs repository@digest; the digest stays empty until the first release.
+# Secrets are referenced by name only; the Secret audit-archiver-secrets is created outside Git.
+# Kafka consumer; /health and /metrics on 8320 (ADR-014)
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-audit-archiver
+  digest: ""
+containerPort: 8320
+healthPath: /health
+command:
+  - "python"
+  - "-m"
+  - "audit_archiver.app"
+env:
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  S3_ENDPOINT_URL: "http://s3:8333"
+  AUDIT_BUCKET: "o2c-audit"
+# Keys: EVENTS_DATABASE_URL, S3_ACCESS_KEY, S3_SECRET_KEY
+secretName: audit-archiver-secrets
+resources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    cpu: 250m
+    memory: 512Mi
