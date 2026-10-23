@@ -6,7 +6,7 @@
 # (/app/models/o2c-doc-classifier): no MLFLOW_TRACKING_URI needed
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-classifier
-  digest: ""
+  digest: "sha256:a957c544b8d91bfa378b634bafec181f4a0b12e1e51259ce744fce53b44c71f6"
 containerPort: 8301
 healthPath: /health
 command:

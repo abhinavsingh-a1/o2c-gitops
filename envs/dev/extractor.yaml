@@ -4,7 +4,7 @@
 # Secrets are referenced by name only; the Secret extractor-secrets is created outside Git.
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-extractor
-  digest: ""
+  digest: "sha256:f7d967928000e7a95d919d98f9f10440f3c3e2d7240143beb00dcc1ac16d1fd3"
 containerPort: 8300
 healthPath: /health
 command:

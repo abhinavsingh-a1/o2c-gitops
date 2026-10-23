@@ -7,7 +7,7 @@
 # Open: reviewer accounts (AUTH_USERS_FILE) need a mounted file; the chart has no volumes yet.
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-agent
-  digest: ""
+  digest: "sha256:894b0fb0b2d1d48bed3955b7e10d03382d5a1c53b66f01aca86b5debc3325bde"
 containerPort: 8400
 healthPath: /health
 command:
