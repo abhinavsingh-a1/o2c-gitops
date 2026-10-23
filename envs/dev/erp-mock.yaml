@@ -1,0 +1,19 @@
+# Dev values for erp-mock (shared chart o2c-infra/helm/o2c-service >= 0.3.0).
+# image.repository and image.digest are set by o2c-app's release workflow (ADR-016):
+# the pod runs repository@digest; the digest stays empty until the first release.
+# Secrets are referenced by name only; the Secret erp-mock-secrets is created outside Git.
+# The image's CMD runs the Alembic migrations, then the API
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-erp-mock
+  digest: ""
+containerPort: 8100
+healthPath: /health
+# Keys: ERP_DATABASE_URL
+secretName: erp-mock-secrets
+resources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    cpu: 250m
+    memory: 512Mi

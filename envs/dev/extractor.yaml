@@ -1,0 +1,30 @@
+# Dev values for extractor (shared chart o2c-infra/helm/o2c-service >= 0.3.0).
+# image.repository and image.digest are set by o2c-app's release workflow (ADR-016):
+# the pod runs repository@digest; the digest stays empty until the first release.
+# Secrets are referenced by name only; the Secret extractor-secrets is created outside Git.
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-extractor
+  digest: ""
+containerPort: 8300
+healthPath: /health
+command:
+  - "uvicorn"
+  - "extractor.app:create_app"
+  - "--factory"
+  - "--host"
+  - "0.0.0.0"
+  - "--port"
+  - "8300"
+env:
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  S3_ENDPOINT_URL: "http://s3:8333"
+  LITELLM_BASE_URL: "http://litellm:4000"
+# Keys: LITELLM_MASTER_KEY (its own virtual key), EVENTS_DATABASE_URL, S3_ACCESS_KEY, S3_SECRET_KEY
+secretName: extractor-secrets
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi

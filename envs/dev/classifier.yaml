@@ -1,0 +1,29 @@
+# Dev values for classifier (shared chart o2c-infra/helm/o2c-service >= 0.3.0).
+# image.repository and image.digest are set by o2c-app's release workflow (ADR-016):
+# the pod runs repository@digest; the digest stays empty until the first release.
+# Secrets are referenced by name only; the Secret classifier-secrets is created outside Git.
+# Kafka consumer; /health and /metrics on 8301. DistilBERT is baked into the image
+# (/app/models/o2c-doc-classifier): no MLFLOW_TRACKING_URI needed
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-classifier
+  digest: ""
+containerPort: 8301
+healthPath: /health
+command:
+  - "python"
+  - "-m"
+  - "classifier.app"
+env:
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  S3_ENDPOINT_URL: "http://s3:8333"
+  LITELLM_BASE_URL: "http://litellm:4000"
+  HF_HUB_OFFLINE: "1"
+# Keys: LITELLM_MASTER_KEY (its own virtual key), EVENTS_DATABASE_URL, S3_ACCESS_KEY, S3_SECRET_KEY
+secretName: classifier-secrets
+resources:
+  requests:
+    cpu: 250m
+    memory: 1Gi
+  limits:
+    cpu: "1"
+    memory: 2Gi

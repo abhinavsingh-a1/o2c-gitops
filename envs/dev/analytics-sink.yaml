@@ -1,0 +1,25 @@
+# Dev values for analytics-sink (shared chart o2c-infra/helm/o2c-service >= 0.3.0).
+# image.repository and image.digest are set by o2c-app's release workflow (ADR-016):
+# the pod runs repository@digest; the digest stays empty until the first release.
+# Secrets are referenced by name only; the Secret analytics-sink-secrets is created outside Git.
+# Kafka consumer; /health and /metrics on 8310 (ADR-013)
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-analytics-sink
+  digest: ""
+containerPort: 8310
+healthPath: /health
+command:
+  - "python"
+  - "-m"
+  - "analytics_sink.app"
+env:
+  KAFKA_BOOTSTRAP: "kafka:9092"
+# Keys: EVENTS_DATABASE_URL, LITELLM_DATABASE_URL, GRAFANA_DB_PASSWORD
+secretName: analytics-sink-secrets
+resources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    cpu: 250m
+    memory: 512Mi
