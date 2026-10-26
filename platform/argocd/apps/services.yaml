@@ -1,0 +1,54 @@
+# One Application per service and environment (o2c-app ADR-017), generated from the
+# values files envs/<env>/<service>.yaml: <service>-<env> in namespace o2c-<env>.
+# Two sources: the shared chart from o2c-infra and the values file from this repo.
+# dev syncs automatically (prune, selfHeal): the release's gitops PR deploys on merge.
+# test and prod sync only by hand, after a promotion PR changed their digests.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: o2c-services
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/abhinavsingh-a1/o2c-gitops.git
+        revision: main
+        files:
+          - path: envs/dev/*.yaml
+          - path: envs/test/*.yaml
+          - path: envs/prod/*.yaml
+  template:
+    metadata:
+      name: '{{ trimSuffix ".yaml" .path.filename }}-{{ .path.basename }}'
+      labels:
+        o2c.io/service: '{{ trimSuffix ".yaml" .path.filename }}'
+        o2c.io/environment: "{{ .path.basename }}"
+    spec:
+      project: o2c-services
+      sources:
+        - repoURL: https://github.com/abhinavsingh-a1/o2c-infra.git
+          targetRevision: main
+          path: helm/o2c-service
+          helm:
+            releaseName: '{{ trimSuffix ".yaml" .path.filename }}'
+            valueFiles:
+              - "$values/{{ .path.path }}/{{ .path.filename }}"
+        - repoURL: https://github.com/abhinavsingh-a1/o2c-gitops.git
+          targetRevision: main
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "o2c-{{ .path.basename }}"
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=false  # platform/namespaces owns them
+  templatePatch: |
+    {{- if eq .path.basename "dev" }}
+    spec:
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+    {{- end }}

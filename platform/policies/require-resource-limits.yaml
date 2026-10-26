@@ -1,0 +1,37 @@
+# Every container in o2c-* declares CPU and memory limits (o2c-app ADR-017), so one
+# service cannot starve the others on the node.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: o2c-require-resource-limits
+  annotations:
+    policies.kyverno.io/title: Require resource limits
+spec:
+  admission: true
+  emitWarning: false
+  background: true
+  rules:
+    - name: cpu-and-memory-limits
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: ["o2c-*"]
+      validate:
+        failureAction: Enforce
+        # Existing violating pods are not grandfathered in: updates must comply too
+        allowExistingViolations: false
+        message: "Every container in {{request.namespace}} needs resources.limits.cpu and .memory."
+        pattern:
+          spec:
+            =(initContainers):
+              - resources:
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"
+            containers:
+              - resources:
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"

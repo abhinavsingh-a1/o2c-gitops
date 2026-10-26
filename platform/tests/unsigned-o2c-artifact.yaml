@@ -1,0 +1,21 @@
+# Must be REJECTED by Kyverno (o2c-app ADR-017): an allowed registry path, pinned by
+# digest, non-root, with limits, but not signed by the release workflow (it is the
+# DistilBERT model artifact pushed with oras by ml/publish_models.py, models.lock.json).
+# Only o2c-verify-image-signatures can reject it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: policy-test-unsigned-o2c-artifact
+  namespace: o2c-dev
+spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+  containers:
+    - name: app
+      image: ghcr.io/abhinavsingh-a1/o2c-model-doc-classifier@sha256:03dc673583d1e5fe4d2de3f546d4e19119833485a062369b0362408f461d8d50  # yamllint disable-line rule:line-length
+      resources:
+        limits:
+          cpu: 100m
+          memory: 64Mi

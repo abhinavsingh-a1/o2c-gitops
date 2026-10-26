@@ -1,0 +1,32 @@
+# Only the released O2C images may run in o2c-* (o2c-app ADR-017).
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: o2c-restrict-image-registries
+  annotations:
+    policies.kyverno.io/title: Allow only ghcr.io/abhinavsingh-a1/o2c-* images
+spec:
+  admission: true
+  emitWarning: false
+  background: true
+  rules:
+    - name: only-o2c-images
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: ["o2c-*"]
+      validate:
+        failureAction: Enforce
+        # Existing violating pods are not grandfathered in: updates must comply too
+        allowExistingViolations: false
+        message: "Only ghcr.io/abhinavsingh-a1/o2c-* images may run in {{request.namespace}}."
+        pattern:
+          spec:
+            =(initContainers):
+              - image: "ghcr.io/abhinavsingh-a1/o2c-*"
+            =(ephemeralContainers):
+              - image: "ghcr.io/abhinavsingh-a1/o2c-*"
+            containers:
+              - image: "ghcr.io/abhinavsingh-a1/o2c-*"

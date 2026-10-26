@@ -1,0 +1,34 @@
+# prod values for classifier (shared chart o2c-infra/helm/o2c-service >= 0.4.0, ADR-017).
+# image.repository and image.digest are set by o2c-app's release workflow in dev
+# (ADR-016) and copied to test and prod by a promotion PR.
+# Credentials: Secret classifier-secrets (o2c-infra platform/kind/secrets.sh), never in Git.
+# prod runs 0 replicas until a release is promoted to it (manual sync).
+# Kafka consumer; /health and /metrics on 8301. DistilBERT is baked into the image
+# (/app/models/o2c-doc-classifier): no MLFLOW_TRACKING_URI needed
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-classifier
+  digest: "sha256:a957c544b8d91bfa378b634bafec181f4a0b12e1e51259ce744fce53b44c71f6"
+replicaCount: 0
+o2cEnv: prod
+containerPort: 8301
+healthPath: /health
+command:
+  - "python"
+  - "-m"
+  - "classifier.app"
+# Infrastructure runs in Docker Compose on the host (host.docker.internal)
+env:
+  KAFKA_BOOTSTRAP: "host.docker.internal:29092"
+  S3_ENDPOINT_URL: "http://host.docker.internal:8333"
+  LITELLM_BASE_URL: "http://host.docker.internal:4000"
+  HF_HUB_OFFLINE: "1"
+# Keys: LITELLM_MASTER_KEY (its own virtual key), EVENTS_DATABASE_URL, S3_ACCESS_KEY,
+# S3_SECRET_KEY
+secretName: classifier-secrets
+resources:
+  requests:
+    cpu: 250m
+    memory: 1Gi
+  limits:
+    cpu: "1"
+    memory: 2Gi

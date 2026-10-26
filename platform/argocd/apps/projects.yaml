@@ -1,0 +1,48 @@
+# Two AppProjects (o2c-app ADR-017), so a service Application can never touch cluster
+# resources: o2c-platform owns namespaces and policies, o2c-services only namespaced
+# resources in o2c-dev, o2c-test and o2c-prod.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: o2c-platform
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+spec:
+  description: Namespaces and Kyverno policies of the O2C platform
+  sourceRepos:
+    - https://github.com/abhinavsingh-a1/o2c-gitops.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: "*"
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: kyverno.io
+      kind: ClusterPolicy
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: o2c-services
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+spec:
+  description: O2C services (shared chart from o2c-infra, values from o2c-gitops)
+  sourceRepos:
+    - https://github.com/abhinavsingh-a1/o2c-infra.git
+    - https://github.com/abhinavsingh-a1/o2c-gitops.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: o2c-dev
+    - server: https://kubernetes.default.svc
+      namespace: o2c-test
+    - server: https://kubernetes.default.svc
+      namespace: o2c-prod
+  clusterResourceWhitelist: []
+  namespaceResourceWhitelist:
+    - group: apps
+      kind: Deployment
+    - group: ""
+      kind: Service

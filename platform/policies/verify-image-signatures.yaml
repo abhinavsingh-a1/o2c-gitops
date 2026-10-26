@@ -1,0 +1,41 @@
+# Only images signed by o2c-app's release workflow on main run in o2c-* (o2c-app ADR-016,
+# ADR-017). The release signs each digest keyless with cosign: a Sigstore bundle whose
+# Fulcio certificate names the workflow, issued for GitHub Actions' OIDC token.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: o2c-verify-image-signatures
+  annotations:
+    policies.kyverno.io/title: Verify O2C image signatures
+    policies.kyverno.io/description: >-
+      Every o2c image must carry a keyless signature from
+      abhinavsingh-a1/o2c-app/.github/workflows/release.yml on refs/heads/main.
+spec:
+  admission: true
+  emitWarning: false
+  webhookTimeoutSeconds: 30
+  background: false
+  rules:
+    - name: release-workflow-signature
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: ["o2c-*"]
+      verifyImages:
+        - imageReferences: ["ghcr.io/abhinavsingh-a1/o2c-*"]
+          failureAction: Enforce
+          type: SigstoreBundle
+          mutateDigest: false
+          verifyDigest: true
+          useCache: true
+          required: true
+          attestors:
+            - entries:
+                - keyless:
+                    issuer: https://token.actions.githubusercontent.com
+                    subject: https://github.com/abhinavsingh-a1/o2c-app/.github/workflows/release.yml@refs/heads/main
+                    rekor:
+                      url: https://rekor.sigstore.dev
+                  signatureAlgorithm: sha256

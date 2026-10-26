@@ -1,0 +1,29 @@
+# test values for analytics-sink (shared chart o2c-infra/helm/o2c-service >= 0.4.0, ADR-017).
+# image.repository and image.digest are set by o2c-app's release workflow in dev
+# (ADR-016) and copied to test and prod by a promotion PR.
+# Credentials: Secret analytics-sink-secrets (o2c-infra platform/kind/secrets.sh), never in Git.
+# test runs 0 replicas until a release is promoted to it (manual sync).
+# Kafka consumer; /health and /metrics on 8310 (ADR-013)
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-analytics-sink
+  digest: "sha256:9fa7a037368c0ac9dd4422fb24ee76e5e6c88e74465afe915809c01f7f988e5f"
+replicaCount: 0
+o2cEnv: test
+containerPort: 8310
+healthPath: /health
+command:
+  - "python"
+  - "-m"
+  - "analytics_sink.app"
+# Infrastructure runs in Docker Compose on the host (host.docker.internal)
+env:
+  KAFKA_BOOTSTRAP: "host.docker.internal:29092"
+# Keys: EVENTS_DATABASE_URL, LITELLM_DATABASE_URL, GRAFANA_DB_PASSWORD
+secretName: analytics-sink-secrets
+resources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    cpu: 250m
+    memory: 512Mi

@@ -1,0 +1,20 @@
+# Must be REJECTED by Kyverno (o2c-app ADR-017): a released, signed O2C image by digest
+# with limits, but running as root, so only o2c-require-run-as-non-root can reject it.
+# The digest is a released erp-mock image (envs/dev/erp-mock.yaml at the time of
+# writing); any signed release works.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: policy-test-root-pod
+  namespace: o2c-dev
+spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsUser: 0
+  containers:
+    - name: app
+      image: ghcr.io/abhinavsingh-a1/o2c-erp-mock@sha256:f3c930104923247b88dcbe69863bda683703523f61aafd02724b45b23f06dfed  # yamllint disable-line rule:line-length
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi

@@ -1,0 +1,56 @@
+# Images run by digest, never by a tag that can move (o2c-app ADR-016, ADR-017):
+# no :latest (or no tag at all, which means latest), and no tag without a digest.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: o2c-require-image-digest
+  annotations:
+    policies.kyverno.io/title: Disallow latest and tags without digest
+spec:
+  admission: true
+  emitWarning: false
+  background: true
+  rules:
+    - name: disallow-latest-tag
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: ["o2c-*"]
+      validate:
+        failureAction: Enforce
+        # Existing violating pods are not grandfathered in: updates must comply too
+        allowExistingViolations: false
+        message: "The latest tag is not allowed in {{request.namespace}}: deploy by digest."
+        foreach:
+          - list: "request.object.spec.[containers, initContainers, ephemeralContainers][]"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: Equals
+                    value: "*:latest"
+                  - key: "{{ element.image }}"
+                    operator: Equals
+                    value: "*:latest@*"
+    - name: require-digest
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: ["o2c-*"]
+      validate:
+        failureAction: Enforce
+        # Existing violating pods are not grandfathered in: updates must comply too
+        allowExistingViolations: false
+        message: "Images in {{request.namespace}} must be pinned by digest (image@sha256:...)."
+        pattern:
+          spec:
+            =(initContainers):
+              - image: "*@sha256:*"
+            =(ephemeralContainers):
+              - image: "*@sha256:*"
+            containers:
+              - image: "*@sha256:*"

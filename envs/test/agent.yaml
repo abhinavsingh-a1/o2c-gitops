@@ -1,0 +1,44 @@
+# test values for agent (shared chart o2c-infra/helm/o2c-service >= 0.4.0, ADR-017).
+# image.repository and image.digest are set by o2c-app's release workflow in dev
+# (ADR-016) and copied to test and prod by a promotion PR.
+# Credentials: Secret agent-secrets (o2c-infra platform/kind/secrets.sh), never in Git.
+# test runs 0 replicas until a release is promoted to it (manual sync).
+# The anomaly model is baked into the image (/app/models/o2c-quantity-anomaly):
+# no MLFLOW_TRACKING_URI needed. erp-mock is reached through its Service (port 80);
+# the Service keeps port 8400 because the ui proxies to agent:8400
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-agent
+  digest: "sha256:894b0fb0b2d1d48bed3955b7e10d03382d5a1c53b66f01aca86b5debc3325bde"
+replicaCount: 0
+o2cEnv: test
+containerPort: 8400
+servicePort: 8400
+healthPath: /health
+command:
+  - "uvicorn"
+  - "agent.app:create_app"
+  - "--factory"
+  - "--host"
+  - "0.0.0.0"
+  - "--port"
+  - "8400"
+# Infrastructure runs in Docker Compose on the host (host.docker.internal)
+env:
+  KAFKA_BOOTSTRAP: "host.docker.internal:29092"
+  S3_ENDPOINT_URL: "http://host.docker.internal:8333"
+  LITELLM_BASE_URL: "http://host.docker.internal:4000"
+  ERP_BASE_URL: "http://erp-mock"
+  AUTH_USERS_FILE: "/app/local/users.json"
+# Keys: LITELLM_MASTER_KEY (its own virtual key), EVENTS_DATABASE_URL, S3_ACCESS_KEY,
+# S3_SECRET_KEY, AUTH_JWT_SECRET
+secretName: agent-secrets
+secretFiles:
+  - secretName: agent-users
+    mountPath: /app/local
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi

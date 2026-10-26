@@ -1,0 +1,31 @@
+# test values for audit-archiver (shared chart o2c-infra/helm/o2c-service >= 0.4.0, ADR-017).
+# image.repository and image.digest are set by o2c-app's release workflow in dev
+# (ADR-016) and copied to test and prod by a promotion PR.
+# Credentials: Secret audit-archiver-secrets (o2c-infra platform/kind/secrets.sh), never in Git.
+# test runs 0 replicas until a release is promoted to it (manual sync).
+# Kafka consumer; /health and /metrics on 8320 (ADR-014)
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-audit-archiver
+  digest: "sha256:0fa10bf781594f5e92c53c94734f002414fc55bd922b7b8a82d97558de7b1cbe"
+replicaCount: 0
+o2cEnv: test
+containerPort: 8320
+healthPath: /health
+command:
+  - "python"
+  - "-m"
+  - "audit_archiver.app"
+# Infrastructure runs in Docker Compose on the host (host.docker.internal)
+env:
+  KAFKA_BOOTSTRAP: "host.docker.internal:29092"
+  S3_ENDPOINT_URL: "http://host.docker.internal:8333"
+  AUDIT_BUCKET: "o2c-audit"
+# Keys: EVENTS_DATABASE_URL, S3_ACCESS_KEY, S3_SECRET_KEY
+secretName: audit-archiver-secrets
+resources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    cpu: 250m
+    memory: 512Mi

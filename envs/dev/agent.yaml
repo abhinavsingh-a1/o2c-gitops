@@ -1,14 +1,17 @@
-# Dev values for agent (shared chart o2c-infra/helm/o2c-service >= 0.3.0).
-# image.repository and image.digest are set by o2c-app's release workflow (ADR-016):
-# the pod runs repository@digest; the digest stays empty until the first release.
-# Secrets are referenced by name only; the Secret agent-secrets is created outside Git.
+# dev values for agent (shared chart o2c-infra/helm/o2c-service >= 0.4.0, ADR-017).
+# image.repository and image.digest are set by o2c-app's release workflow in dev
+# (ADR-016) and copied to test and prod by a promotion PR.
+# Credentials: Secret agent-secrets (o2c-infra platform/kind/secrets.sh), never in Git.
 # The anomaly model is baked into the image (/app/models/o2c-quantity-anomaly):
-# no MLFLOW_TRACKING_URI needed. erp-mock is reached through its Service (port 80).
-# Open: reviewer accounts (AUTH_USERS_FILE) need a mounted file; the chart has no volumes yet.
+# no MLFLOW_TRACKING_URI needed. erp-mock is reached through its Service (port 80);
+# the Service keeps port 8400 because the ui proxies to agent:8400
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-agent
   digest: "sha256:894b0fb0b2d1d48bed3955b7e10d03382d5a1c53b66f01aca86b5debc3325bde"
+replicaCount: 1
+o2cEnv: dev
 containerPort: 8400
+servicePort: 8400
 healthPath: /health
 command:
   - "uvicorn"
@@ -18,14 +21,19 @@ command:
   - "0.0.0.0"
   - "--port"
   - "8400"
+# Infrastructure runs in Docker Compose on the host (host.docker.internal)
 env:
-  KAFKA_BOOTSTRAP: "kafka:9092"
-  S3_ENDPOINT_URL: "http://s3:8333"
-  LITELLM_BASE_URL: "http://litellm:4000"
+  KAFKA_BOOTSTRAP: "host.docker.internal:29092"
+  S3_ENDPOINT_URL: "http://host.docker.internal:8333"
+  LITELLM_BASE_URL: "http://host.docker.internal:4000"
   ERP_BASE_URL: "http://erp-mock"
-# Keys: LITELLM_MASTER_KEY (its own virtual key), EVENTS_DATABASE_URL, S3_ACCESS_KEY, S3_SECRET_KEY,
-# AUTH_JWT_SECRET
+  AUTH_USERS_FILE: "/app/local/users.json"
+# Keys: LITELLM_MASTER_KEY (its own virtual key), EVENTS_DATABASE_URL, S3_ACCESS_KEY,
+# S3_SECRET_KEY, AUTH_JWT_SECRET
 secretName: agent-secrets
+secretFiles:
+  - secretName: agent-users
+    mountPath: /app/local
 resources:
   requests:
     cpu: 250m
