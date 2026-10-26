@@ -18,6 +18,7 @@ command:
 # Infrastructure runs in Docker Compose on the host (host.docker.internal)
 env:
   KAFKA_BOOTSTRAP: "host.docker.internal:29092"
+  KAFKA_ADDRESS_FAMILY: "v4"  # host.docker.internal also resolves to unreachable IPv6
   S3_ENDPOINT_URL: "http://host.docker.internal:8333"
   AUDIT_BUCKET: "o2c-audit"
 # Keys: EVENTS_DATABASE_URL, S3_ACCESS_KEY, S3_SECRET_KEY

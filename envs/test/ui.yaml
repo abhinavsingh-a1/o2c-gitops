@@ -12,6 +12,9 @@ replicaCount: 0
 o2cEnv: test
 containerPort: 8080
 healthPath: /
+# No Kafka client; set like every service so the environment is uniform
+env:
+  KAFKA_ADDRESS_FAMILY: "v4"
 resources:
   requests:
     cpu: 25m
