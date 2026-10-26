@@ -5,7 +5,7 @@
 # gunicorn with 2 workers; metrics in multiprocess mode under /tmp (ADR-012)
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-intake
-  digest: "sha256:fc6e4967d8e7e66e61cf27e7f2643e23ae0dab253c7bd16674f058f29424b7f4"
+  digest: "sha256:12e3958980e93c4c60af2a21650cb8513fcb22ce5b0e9beded68777c8754052c"
 replicaCount: 1
 o2cEnv: dev
 containerPort: 8200
@@ -18,7 +18,7 @@ command:
 # Infrastructure runs in Docker Compose on the host (host.docker.internal)
 env:
   KAFKA_BOOTSTRAP: "host.docker.internal:29092"
-  KAFKA_ADDRESS_FAMILY: "v4"  # host.docker.internal also resolves to unreachable IPv6
+  KAFKA_ADDRESS_FAMILY: "v4" # host.docker.internal also resolves to unreachable IPv6
   S3_ENDPOINT_URL: "http://host.docker.internal:8333"
   PROMETHEUS_MULTIPROC_DIR: "/tmp/prometheus-intake"
 # Keys: INTAKE_HMAC_SECRET, S3_ACCESS_KEY, S3_SECRET_KEY

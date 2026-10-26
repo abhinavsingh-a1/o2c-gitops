@@ -6,7 +6,7 @@
 # (/app/models/o2c-doc-classifier): no MLFLOW_TRACKING_URI needed
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-classifier
-  digest: "sha256:1f32ea23846dabcfaef075c3c1fcfcbfd6cc8bd735d295293cff3d1b9d115602"
+  digest: "sha256:93c927ea453454e35f0e1b5e4d8439cd00934c71e49a05ed2d7bba0d19176a7e"
 replicaCount: 1
 o2cEnv: dev
 containerPort: 8301
@@ -18,7 +18,7 @@ command:
 # Infrastructure runs in Docker Compose on the host (host.docker.internal)
 env:
   KAFKA_BOOTSTRAP: "host.docker.internal:29092"
-  KAFKA_ADDRESS_FAMILY: "v4"  # host.docker.internal also resolves to unreachable IPv6
+  KAFKA_ADDRESS_FAMILY: "v4" # host.docker.internal also resolves to unreachable IPv6
   S3_ENDPOINT_URL: "http://host.docker.internal:8333"
   LITELLM_BASE_URL: "http://host.docker.internal:4000"
   HF_HUB_OFFLINE: "1"

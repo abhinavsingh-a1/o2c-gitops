@@ -5,7 +5,7 @@
 # The image's CMD runs the Alembic migrations, then the API
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-erp-mock
-  digest: "sha256:7232497c38f606ebdf4b8255a4bbb5b2e398f32b399f23568d3bca038d0542fe"
+  digest: "sha256:c0ed55b0d0273c6d72ce2a6bd2caef4cc59bda58d13a5be48ec9f8a639dba471"
 replicaCount: 1
 o2cEnv: dev
 containerPort: 8100

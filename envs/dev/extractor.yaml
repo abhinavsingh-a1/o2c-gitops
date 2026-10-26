@@ -4,7 +4,7 @@
 # Credentials: Secret extractor-secrets (o2c-infra platform/kind/secrets.sh), never in Git.
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-extractor
-  digest: "sha256:7e33ce1942d0f0cfbea856468585bc94b283a1a1af9823d5f850850167dc48e7"
+  digest: "sha256:1cfc6b14541c7aa188f8b08a3efc93d8f215082de0ca935de22ef68a2efbbbd9"
 replicaCount: 1
 o2cEnv: dev
 containerPort: 8300
@@ -20,7 +20,7 @@ command:
 # Infrastructure runs in Docker Compose on the host (host.docker.internal)
 env:
   KAFKA_BOOTSTRAP: "host.docker.internal:29092"
-  KAFKA_ADDRESS_FAMILY: "v4"  # host.docker.internal also resolves to unreachable IPv6
+  KAFKA_ADDRESS_FAMILY: "v4" # host.docker.internal also resolves to unreachable IPv6
   S3_ENDPOINT_URL: "http://host.docker.internal:8333"
   LITELLM_BASE_URL: "http://host.docker.internal:4000"
 # Keys: LITELLM_MASTER_KEY (its own virtual key), EVENTS_DATABASE_URL, S3_ACCESS_KEY,
