@@ -5,7 +5,7 @@
 # Kafka consumer; /health and /metrics on 8310 (ADR-013)
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-analytics-sink
-  digest: "sha256:9fa7a037368c0ac9dd4422fb24ee76e5e6c88e74465afe915809c01f7f988e5f"
+  digest: "sha256:8f2f1d110b8cdd2efa06e7f5cbae55198a490b6dbaea1bfb4f743d08dcfbf3f9"
 replicaCount: 1
 o2cEnv: dev
 containerPort: 8310
