@@ -1,0 +1,51 @@
+# Namespaces first, then the Kyverno policies, then (wave 0) the services, so no pod is
+# admitted before the policies exist (o2c-app ADR-017).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: o2c-namespaces
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  project: o2c-platform
+  source:
+    repoURL: https://github.com/abhinavsingh-a1/o2c-gitops.git
+    targetRevision: main
+    path: platform/namespaces
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: false  # deleting a namespace deletes everything in it: by hand only
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: o2c-policies
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: o2c-platform
+  source:
+    repoURL: https://github.com/abhinavsingh-a1/o2c-gitops.git
+    targetRevision: main
+    path: platform/policies
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true  # a policy changed or deleted by hand is restored
+    syncOptions:
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+  # The policies spell out Kyverno's defaults, except the deprecated spec-level
+  # validationFailureAction (Kyverno sets Audit); every rule sets failureAction: Enforce.
+  ignoreDifferences:
+    - group: kyverno.io
+      kind: ClusterPolicy
+      jsonPointers:
+        - /spec/validationFailureAction

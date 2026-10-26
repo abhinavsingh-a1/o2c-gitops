@@ -1,0 +1,28 @@
+# test values for ui (shared chart o2c-infra/helm/o2c-service >= 0.4.0, ADR-017).
+# image.repository and image.digest are set by o2c-app's release workflow in dev
+# (ADR-016) and copied to test and prod by a promotion PR.
+# The ui needs no credentials.
+# test runs 0 replicas until a release is promoted to it (manual sync).
+# nginx-unprivileged runs as uid 101 and writes only to /tmp; it proxies /api to
+# agent:8400
+image:
+  repository: ghcr.io/abhinavsingh-a1/o2c-ui
+  digest: "sha256:d76c3587cac0c88dfb0c80bdbd040550137281080abb53f351fdac6a042a5d29"
+replicaCount: 0
+o2cEnv: test
+containerPort: 8080
+healthPath: /
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+  runAsGroup: 101
+  fsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault

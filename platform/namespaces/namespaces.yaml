@@ -1,0 +1,22 @@
+# One namespace per environment (o2c-app ADR-017). The Kyverno policies match o2c-*;
+# the services' Kafka topics and consumer groups carry the same environment prefix.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: o2c-dev
+  labels:
+    o2c.io/environment: dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: o2c-test
+  labels:
+    o2c.io/environment: test
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: o2c-prod
+  labels:
+    o2c.io/environment: prod

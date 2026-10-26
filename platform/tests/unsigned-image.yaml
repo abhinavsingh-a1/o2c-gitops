@@ -1,0 +1,20 @@
+# Must be REJECTED by Kyverno (o2c-app ADR-017): an unsigned image from Docker Hub, by
+# tag. Otherwise well-behaved (non-root, limits), so only the image rules can reject it:
+# o2c-restrict-image-registries and o2c-require-image-digest.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: policy-test-unsigned-image
+  namespace: o2c-dev
+spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 101
+  containers:
+    - name: nginx
+      image: docker.io/library/nginx:1.27
+      resources:
+        limits:
+          cpu: 100m
+          memory: 64Mi

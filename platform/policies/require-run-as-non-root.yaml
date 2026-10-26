@@ -1,0 +1,77 @@
+# No container in o2c-* runs as root (o2c-app ADR-017): runAsNonRoot must be true for
+# the pod or for every container, and no container may set runAsUser 0.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: o2c-require-run-as-non-root
+  annotations:
+    policies.kyverno.io/title: Require runAsNonRoot
+spec:
+  admission: true
+  emitWarning: false
+  background: true
+  rules:
+    - name: run-as-non-root
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: ["o2c-*"]
+      validate:
+        failureAction: Enforce
+        # Existing violating pods are not grandfathered in: updates must comply too
+        allowExistingViolations: false
+        message: "Pods in {{request.namespace}} must set runAsNonRoot: true (pod or every container)."
+        anyPattern:
+          # On the pod; containers may repeat it but not turn it off
+          - spec:
+              securityContext:
+                runAsNonRoot: true
+              =(initContainers):
+                - =(securityContext):
+                    =(runAsNonRoot): true
+              =(ephemeralContainers):
+                - =(securityContext):
+                    =(runAsNonRoot): true
+              containers:
+                - =(securityContext):
+                    =(runAsNonRoot): true
+          # On every container
+          - spec:
+              =(securityContext):
+                =(runAsNonRoot): true
+              =(initContainers):
+                - securityContext:
+                    runAsNonRoot: true
+              =(ephemeralContainers):
+                - securityContext:
+                    runAsNonRoot: true
+              containers:
+                - securityContext:
+                    runAsNonRoot: true
+    - name: no-run-as-user-0
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: ["o2c-*"]
+      validate:
+        failureAction: Enforce
+        # Existing violating pods are not grandfathered in: updates must comply too
+        allowExistingViolations: false
+        message: "runAsUser 0 (root) is not allowed in {{request.namespace}}."
+        pattern:
+          spec:
+            =(securityContext):
+              =(runAsUser): ">0"
+            =(initContainers):
+              - =(securityContext):
+                  =(runAsUser): ">0"
+            =(ephemeralContainers):
+              - =(securityContext):
+                  =(runAsUser): ">0"
+            containers:
+              - =(securityContext):
+                  =(runAsUser): ">0"
