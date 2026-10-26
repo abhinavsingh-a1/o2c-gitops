@@ -17,6 +17,7 @@ command:
 # Infrastructure runs in Docker Compose on the host (host.docker.internal)
 env:
   KAFKA_BOOTSTRAP: "host.docker.internal:29092"
+  KAFKA_ADDRESS_FAMILY: "v4"  # host.docker.internal also resolves to unreachable IPv6
 # Keys: EVENTS_DATABASE_URL, LITELLM_DATABASE_URL, GRAFANA_DB_PASSWORD
 secretName: analytics-sink-secrets
 resources:
