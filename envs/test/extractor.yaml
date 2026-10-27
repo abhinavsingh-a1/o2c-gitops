@@ -5,7 +5,7 @@
 # test runs 0 replicas until a release is promoted to it (manual sync).
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-extractor
-  digest: "sha256:f9d2bd0633005955d174a0f37c9ff45c40d6673d30edf6def192460cccab7ec7"
+  digest: "sha256:490891f778dc3ccabdf7ba64447b7fd57aaddb7b210d3a8dc68f0c46cb2531bc"
 replicaCount: 1
 o2cEnv: test
 containerPort: 8300
