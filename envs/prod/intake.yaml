@@ -6,8 +6,8 @@
 # gunicorn with 2 workers; metrics in multiprocess mode under /tmp (ADR-012)
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-intake
-  digest: "sha256:31ac808e9079cdba5566703ba6aadac7ce68f78db0474c5cb3fa7392f7d98cc9"
-replicaCount: 1
+  digest: "sha256:50ac5e98a79752b94c98fc44357aa9c5433407750cd4118110b8f5188cfd9dca"
+replicaCount: 0
 o2cEnv: prod
 containerPort: 8200
 healthPath: /health
