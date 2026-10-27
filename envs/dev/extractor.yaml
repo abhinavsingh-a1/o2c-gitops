@@ -4,7 +4,7 @@
 # Credentials: Secret extractor-secrets (o2c-infra platform/kind/secrets.sh), never in Git.
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-extractor
-  digest: "sha256:6e84e2b54e6cd557d408b4094aa1196975d4dec5701089629c4bac5e5028085c"
+  digest: "sha256:490891f778dc3ccabdf7ba64447b7fd57aaddb7b210d3a8dc68f0c46cb2531bc"
 replicaCount: 1
 o2cEnv: dev
 containerPort: 8300
