@@ -7,7 +7,7 @@
 # the Service keeps port 8400 because the ui proxies to agent:8400
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-agent
-  digest: "sha256:67367cfce6f1ab591ad593e303944145d8fd6054f6b59838f4b954540f8ce1dc"
+  digest: "sha256:8696e82bbfebb8b991e28541b5d02b4127cdde56d5096cba49e459dd61041100"
 replicaCount: 1
 o2cEnv: dev
 containerPort: 8400
