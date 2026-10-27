@@ -8,7 +8,7 @@
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-ui
   digest: "sha256:d76c3587cac0c88dfb0c80bdbd040550137281080abb53f351fdac6a042a5d29"
-replicaCount: 0
+replicaCount: 1
 o2cEnv: prod
 containerPort: 8080
 healthPath: /

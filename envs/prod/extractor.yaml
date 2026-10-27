@@ -5,8 +5,8 @@
 # prod runs 0 replicas until a release is promoted to it (manual sync).
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-extractor
-  digest: "sha256:f7d967928000e7a95d919d98f9f10440f3c3e2d7240143beb00dcc1ac16d1fd3"
-replicaCount: 0
+  digest: "sha256:490891f778dc3ccabdf7ba64447b7fd57aaddb7b210d3a8dc68f0c46cb2531bc"
+replicaCount: 1
 o2cEnv: prod
 containerPort: 8300
 healthPath: /health
