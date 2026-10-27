@@ -5,7 +5,7 @@
 # Kafka consumer; /health and /metrics on 8320 (ADR-014)
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-audit-archiver
-  digest: "sha256:4b2e9292ecd05b46d55eecc41dbeb2bbcbe246a41db5722750d18da6fe760ab5"
+  digest: "sha256:ea6f3efc9c3dbd578423fe6d7a72b787ed176b23c593f4a50f0a3f6327375a88"
 replicaCount: 1
 o2cEnv: dev
 containerPort: 8320
