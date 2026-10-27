@@ -6,7 +6,7 @@
 # agent:8400
 image:
   repository: ghcr.io/abhinavsingh-a1/o2c-ui
-  digest: "sha256:d76c3587cac0c88dfb0c80bdbd040550137281080abb53f351fdac6a042a5d29"
+  digest: "sha256:56526a6ed26b4af11083b5bbf9e877f8aa1f4e9e9e05f157527cab009373b067"
 replicaCount: 1
 o2cEnv: dev
 containerPort: 8080
